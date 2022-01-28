@@ -88,6 +88,7 @@ var $nobyda = nobyda();
 		cookie = cookie || process.env.IQIYI_COOKIE;
 		LogDetails = LogDetails || process.env.IQIYI_DEBUG;
 		barkKey = barkKey || process.env.BARK_PUSH;
+		barkServer = barkServer || process.env.BARK_SERVER;
 	}
   if ($nobyda.isRequest) {
     GetCookie()
@@ -119,7 +120,7 @@ var $nobyda = nobyda();
         }
         const expires = $nobyda.expire ? $nobyda.expire.replace(/\u5230\u671f/, "") : "获取失败 ⚠️"
         if (!$nobyda.isNode) $nobyda.notify("爱奇艺", "到期时间: " + expires, pushMsg.join('\n'));
-        if (barkKey) await BarkNotify($nobyda, barkKey, '爱奇艺', `到期时间: ${expires}\n${pushMsg.join('\n')}`);
+        if (barkKey) await BarkNotify($nobyda, barkKey, '爱奇艺', `到期时间: ${expires}\n${pushMsg.join('\n')}`, barkServer);
         await $nobyda.time();
       } else {
         console.log(`Cookie缺少关键值，需重新获取`)
@@ -428,7 +429,7 @@ function GetCookie() {
   }
 }
 
-async function BarkNotify(c,k,t,b){for(let i=0;i<3;i++){console.log(`🔷Bark notify >> Start push (${i+1})`);const s=await new Promise((n)=>{c.post({url:'https://api.day.app/push',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t,body:b,device_key:k,ext_params:{group:t}})},(e,r,d)=>r&&r.status==200?n(1):n(d||e))});if(s===1){console.log('✅Push success!');break}else{console.log(`❌Push failed! >> ${s.message||s}`)}}}
+async function BarkNotify(c,k,t,b,p){for(let i=0;i<3;i++){console.log(`🔷Bark notify >> Start push (${i+1})`);const s=await new Promise((n)=>{c.post({url:p||'https://api.day.app/push',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t,body:b,device_key:k,ext_params:{group:t}})},(e,r,d)=>r&&r.status==200?n(1):n(d||e))});if(s===1){console.log('✅Push success!');break}else{console.log(`❌Push failed! >> ${s.message||s}`)}}}
 
 function nobyda() {
   const times = 0
